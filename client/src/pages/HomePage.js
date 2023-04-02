@@ -13,6 +13,29 @@ function HomePage() {
     const [checked, setChecked] = useState([]);
     const [radio, setRadio] = useState([]);
 
+    //pagination
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (page === 1) return;
+        loadMore();
+    }, [page])
+
+    //load more
+    const loadMore = async () => {
+        try {
+            setLoading(true);
+            const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/product-list/${page}`);
+            setLoading(false);
+            setProducts([...products, ...data?.products]);
+
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
+    };
     //get category function
     const getAllCategory = async () => {
         try {
@@ -27,19 +50,33 @@ function HomePage() {
 
     useEffect(() => {
         getAllCategory();
+        getTotal();
     }, [])
 
     //get all products
     const getAllProducts = async () => {
         try {
-            const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/get-product`);
+            setLoading(true);
+            const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/product-list/${page}`);
+            setLoading(false);
             setProducts(data?.products);
             toast.success(data?.message);
         } catch (error) {
             console.log(error);
+            setLoading(false);
             toast.error("Something went wrong");
         }
-    }
+    };
+
+    //get total count
+    const getTotal = async () => {
+        try {
+            const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/product-count`);
+            setTotal(data?.total);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     //Filter by category
 
@@ -57,7 +94,7 @@ function HomePage() {
 
 
     useEffect(() => {
-        if (!checked.length || !radio.length) filterProduct();
+        if (!checked.length || !radio.length) getAllProducts();
     }, [checked, radio])
 
     useEffect(() => {
@@ -77,7 +114,7 @@ function HomePage() {
     }
 
     return (
-        <Layout title={"All prdoducts - Best Offers"}>
+        <Layout title={"All Products - Best Offers"}>
             <div className='row m-0 mt-3'>
                 <div className='col-md-2 border-right'>
                     {/* filter by category */}
@@ -118,6 +155,18 @@ function HomePage() {
                                     <button className="btn btn-secondary ms-1">ADD TO CART</button>
                                 </div>
                             </div>
+                        )}
+                    </div>
+                    <div className='m-2 p-3'>
+                        {products && products.length < total && (
+                            <button className='btn btn-warning'
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    setPage(page + 1);
+                                }}
+                            >
+                                {loading ? "Loading" : "Loadmore"}
+                            </button>
                         )}
                     </div>
                 </div>
