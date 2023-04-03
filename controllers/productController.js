@@ -226,6 +226,7 @@ export const productListController = async (req, res) => {
             .sort({ createdAt: -1 });
         res.status(200).send({
             success: true,
+            message: 'All Products',
             products
         })
     } catch (error) {
@@ -233,6 +234,28 @@ export const productListController = async (req, res) => {
         res.status(400).send({
             success: false,
             message: 'Error in per page ctrl',
+            error
+        })
+    }
+};
+
+//search product controller
+export const searchProductController = async (req, res) => {
+    try {
+        const { keyword } = req.params;
+        const result = await productModel.find({
+            $or: [
+                { name: { $regex: keyword, $options: 'i' } },
+                { description: { $regex: keyword, $options: 'i' } }
+            ]
+        }).select("-photo");
+        res.json(result);
+
+    } catch (error) {
+        console.log(error);
+        res.status(400).send({
+            success: true,
+            message: 'Error in Search Product API',
             error
         })
     }

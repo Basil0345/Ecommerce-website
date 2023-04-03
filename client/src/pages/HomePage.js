@@ -12,6 +12,7 @@ function HomePage() {
     //Filter states
     const [checked, setChecked] = useState([]);
     const [radio, setRadio] = useState([]);
+    const [hideLoadMore, setHideLoadMore] = useState(false);
 
     //pagination
     const [total, setTotal] = useState(0);
@@ -59,7 +60,7 @@ function HomePage() {
             setLoading(true);
             const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/product-list/${page}`);
             setLoading(false);
-            setProducts(data?.products);
+            setProducts([...products, ...data?.products]);
             toast.success(data?.message);
         } catch (error) {
             console.log(error);
@@ -87,6 +88,8 @@ function HomePage() {
         } else {
             all = all.filter((c) => c !== id);
         }
+        setProducts([]);
+        setPage(1);
         setChecked(all);
         console.log(all);
     };
@@ -94,11 +97,19 @@ function HomePage() {
 
 
     useEffect(() => {
-        if (!checked.length || !radio.length) getAllProducts();
-    }, [checked, radio])
+        if (!checked.length && !radio.length) {
+            setProducts([]);
+            // setPage(1);
+            getAllProducts();
+            setHideLoadMore(false);
+        }
+    }, [checked.length, radio.length])
 
     useEffect(() => {
-        if (checked.length || radio.length) filterProduct();
+        if (checked.length || radio.length) {
+            setHideLoadMore(true);
+            filterProduct();
+        }
     }, [checked, radio])
 
 
@@ -135,7 +146,7 @@ function HomePage() {
                             ))}
                         </Radio.Group>
                     </div>
-                    <div className='d-flex flex-column'>
+                    <div className='d-flex flex-column mt-2'>
                         <button className="btn btn-danger" onClick={() => window.location.reload()} >RESET FILTER</button>
                     </div>
                 </div>
@@ -158,16 +169,21 @@ function HomePage() {
                         )}
                     </div>
                     <div className='m-2 p-3'>
-                        {products && products.length < total && (
-                            <button className='btn btn-warning'
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    setPage(page + 1);
-                                }}
-                            >
-                                {loading ? "Loading" : "Loadmore"}
-                            </button>
-                        )}
+                        {hideLoadMore ? (<>
+                            <h5>Found {products.length} </h5>
+                        </>) : (<>
+                            {products && products.length < total && (
+                                <button className='btn btn-warning'
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        setPage(page + 1);
+                                    }}
+                                >
+                                    {loading ? "Loading" : "Loadmore"}
+                                </button>
+                            )}
+                        </>)}
+
                     </div>
                 </div>
             </div>

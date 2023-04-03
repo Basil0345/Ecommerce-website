@@ -22,6 +22,6 @@ export const Prices = [
     {
         _id: 4,
         name: "Rs.800 or more",
-        array: [600, 99999]
+        array: [800, 9999]
     },
 ]
