@@ -4,8 +4,9 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import { Checkbox, Radio } from 'antd';
 import { Prices } from '../components/Prices';
-
+import { useNavigate } from 'react-router-dom';
 function HomePage() {
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
 
@@ -91,7 +92,6 @@ function HomePage() {
         setProducts([]);
         setPage(1);
         setChecked(all);
-        console.log(all);
     };
 
 
@@ -156,13 +156,17 @@ function HomePage() {
                     <div className='d-flex flex-wrap justify-content-evenly'>
                         {products?.map((p) =>
 
-                            <div className="card m-2" style={{ width: '18rem' }} >
+                            <div className="card m-2" style={{ width: '18rem' }} key={p._id} >
                                 <img src={`${process.env.REACT_APP_API}/api/v1/product/product-photo/${p._id}`} className="card-img-top" alt={p.name} />
                                 <div className="card-body">
                                     <h5 className="card-title">{p.name}</h5>
                                     <p className="card-text">{p.description.substring(0, 30)}</p>
                                     <p className="card-text">₹{p.price}</p>
-                                    <button className="btn btn-primary ms-1">More Details</button>
+                                    <button className="btn btn-primary ms-1"
+                                        onClick={() => navigate(`/product/${p.slug}`)}
+                                    >
+                                        More Details
+                                    </button>
                                     <button className="btn btn-secondary ms-1">ADD TO CART</button>
                                 </div>
                             </div>
