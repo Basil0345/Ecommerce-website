@@ -19,7 +19,7 @@ function Header() {
     })
     setCart([]);
     localStorage.removeItem('auth');
-    localStorage.removeItem('cart');
+    // localStorage.removeItem('cart');
 
   }
 
@@ -54,7 +54,7 @@ function Header() {
                     </Link>
                   </li>
                   {categories?.map((c) => (
-                    <li>
+                    <li key={c._id}>
                       <Link
                         className="dropdown-item"
                         to={`/category/${c.slug}`}

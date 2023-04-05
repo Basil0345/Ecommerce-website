@@ -41,15 +41,6 @@ const Register = () => {
             console.log(error);
             toast.error("Something went wrong")
         }
-        // console.log(user);
-        // toast.success("Register Successfully");
-        // setUser({
-        //     name: '',
-        //     email: '',
-        //     password: '',
-        //     phone: '',
-        //     address: ''
-        // })
     }
 
     return (
