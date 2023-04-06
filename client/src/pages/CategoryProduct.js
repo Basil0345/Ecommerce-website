@@ -27,6 +27,21 @@ const CategoryProduct = () => {
         }
     };
 
+    //Add to cart
+    const addToCart = (c) => {
+        let myCart = [...cart];
+        const check_index = myCart.findIndex(item => item._id === c._id);
+        if (check_index !== -1) {
+            myCart[check_index].qty++;
+            setCart(myCart);
+            localStorage.setItem('cart', JSON.stringify(myCart));
+        } else {
+            myCart.push({ ...products.find(p => p._id === c._id), qty: 1 })
+            setCart(myCart);
+            localStorage.setItem('cart', JSON.stringify(myCart));
+        }
+    }
+
     return (
         <Layout>
             <div className='container mt-3'>
@@ -49,8 +64,7 @@ const CategoryProduct = () => {
                                     </button>
                                     <button className="btn btn-secondary ms-1"
                                         onClick={() => {
-                                            setCart([...cart, p]);
-                                            localStorage.setItem('cart', JSON.stringify([...cart, p]));
+                                            addToCart(p);
                                             toast.success("Item added to cart");
                                         }}
                                     >ADD TO CART</button>

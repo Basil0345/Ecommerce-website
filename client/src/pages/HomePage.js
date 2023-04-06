@@ -127,6 +127,21 @@ function HomePage() {
         }
     }
 
+    //Add to cart
+    const addToCart = (c) => {
+        let myCart = [...cart];
+        const check_index = myCart.findIndex(item => item._id === c._id);
+        if (check_index !== -1) {
+            myCart[check_index].qty++;
+            setCart(myCart);
+            localStorage.setItem('cart', JSON.stringify(myCart));
+        } else {
+            myCart.push({ ...products.find(p => p._id === c._id), qty: 1 })
+            setCart(myCart);
+            localStorage.setItem('cart', JSON.stringify(myCart));
+        }
+    }
+
     return (
         <Layout title={"All Products - Best Offers"}>
             <div className='row m-0 mt-3'>
@@ -172,11 +187,11 @@ function HomePage() {
                                     </button>
                                     <button className="btn btn-secondary ms-1"
                                         onClick={() => {
-                                            setCart([...cart, p]);
-                                            localStorage.setItem('cart', JSON.stringify([...cart, p]));
+                                            addToCart(p);
                                             toast.success("Item added to cart");
                                         }}
                                     >ADD TO CART</button>
+
                                 </div>
                             </div>
                         )}
