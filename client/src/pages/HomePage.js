@@ -6,6 +6,9 @@ import { Checkbox, Radio } from 'antd';
 import { Prices } from '../components/Prices';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/cart';
+import "../styles/HomePage.css";
+import { AiOutlineReload } from "react-icons/ai";
+
 
 function HomePage() {
     const navigate = useNavigate();
@@ -32,7 +35,7 @@ function HomePage() {
     const loadMore = async () => {
         try {
             setLoading(true);
-            const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/product-list/${page}`);
+            const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
             setLoading(false);
             setProducts([...products, ...data?.products]);
 
@@ -44,7 +47,7 @@ function HomePage() {
     //get category function
     const getAllCategory = async () => {
         try {
-            const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/category/get-category`)
+            const { data } = await axios.get("/api/v1/category/get-category")
             if (data?.success) {
                 setCategories(data?.category);
             }
@@ -62,7 +65,7 @@ function HomePage() {
     const getAllProducts = async () => {
         try {
             setLoading(true);
-            const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/product-list/${page}`);
+            const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
             setLoading(false);
             setProducts([...products, ...data?.products]);
             toast.success(data?.message);
@@ -76,7 +79,7 @@ function HomePage() {
     //get total count
     const getTotal = async () => {
         try {
-            const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/product-count`);
+            const { data } = await axios.get("/api/v1/product/product-count");
             setTotal(data?.total);
         } catch (error) {
             console.log(error);
@@ -119,7 +122,7 @@ function HomePage() {
     //get filters
     const filterProduct = async () => {
         try {
-            const { data } = await axios.post(`${process.env.REACT_APP_API}/api/v1/product/product-filter`, { checked, radio });
+            const { data } = await axios.post("/api/v1/product/product-filter", { checked, radio });
             setProducts(data?.products);
 
         } catch (error) {
@@ -132,20 +135,39 @@ function HomePage() {
         let myCart = [...cart];
         const check_index = myCart.findIndex(item => item._id === c._id);
         if (check_index !== -1) {
-            myCart[check_index].qty++;
-            setCart(myCart);
-            localStorage.setItem('cart', JSON.stringify(myCart));
+            if (myCart[check_index].qty < c.quantity) {
+                myCart[check_index].qty++;
+                setCart(myCart);
+                localStorage.setItem('cart', JSON.stringify(myCart));
+                toast.success("Item added to cart");
+            } else {
+                toast.error("max out");
+            }
+
         } else {
-            myCart.push({ ...products.find(p => p._id === c._id), qty: 1 })
-            setCart(myCart);
-            localStorage.setItem('cart', JSON.stringify(myCart));
+            if (c.quantity === 0) {
+                toast.error("max out")
+            } else {
+                myCart.push({ ...products.find(p => p._id === c._id), qty: 1 })
+                setCart(myCart);
+                localStorage.setItem('cart', JSON.stringify(myCart));
+                toast.success("Item added to cart");
+            }
         }
     }
 
     return (
         <Layout title={"All Products - Best Offers"}>
-            <div className='row m-0 mt-3'>
-                <div className='col-md-2 border-right'>
+            {/* banner image */}
+            <img
+                src="/images/banner.jpeg"
+                className="banner-img"
+                alt="bannerimage"
+                width={"100%"}
+            />
+            {/* banner image */}
+            <div className='container-fluid row m-0 home-page'>
+                <div className='col-md-3 filters'>
                     {/* filter by category */}
                     <h4 className='text-center '>Filter by Category</h4>
                     <div className='d-flex flex-column'>
@@ -164,34 +186,45 @@ function HomePage() {
                             ))}
                         </Radio.Group>
                     </div>
-                    <div className='d-flex flex-column mt-2'>
+                    <div className='d-flex flex-column'>
                         <button className="btn btn-danger" onClick={() => window.location.reload()} >RESET FILTER</button>
                     </div>
                 </div>
 
-                <div className='col-md-10'>
-                    <h1 className='text-center p-3'>All Products</h1>
+                <div className='col-md-9'>
+                    <h1 className='text-center p-2'>All Products</h1>
                     <div className='d-flex flex-wrap justify-content-evenly'>
                         {products?.map((p) =>
 
                             <div className="card m-2" style={{ width: '18rem' }} key={p._id} >
-                                <img src={`${process.env.REACT_APP_API}/api/v1/product/product-photo/${p._id}`} className="card-img-top" alt={p.name} />
+                                <img src={`/api/v1/product/product-photo/${p._id}`} className="card-img-top" alt={p.name} />
                                 <div className="card-body">
-                                    <h5 className="card-title">{p.name}</h5>
-                                    <p className="card-text">{p.description.substring(0, 30)}</p>
-                                    <p className="card-text">₹{p.price}</p>
-                                    <button className="btn btn-primary ms-1"
-                                        onClick={() => navigate(`/product/${p.slug}`)}
-                                    >
-                                        More Details
-                                    </button>
-                                    <button className="btn btn-secondary ms-1"
-                                        onClick={() => {
-                                            addToCart(p);
-                                            toast.success("Item added to cart");
-                                        }}
-                                    >ADD TO CART</button>
-
+                                    <div className="card-name-price">
+                                        <h5 className="card-title">{p.name}</h5>
+                                        <h5 className="card-title card-price">
+                                            {p.quantity === 0 ? (<p className='text-danger'>Out Of Stock</p>) : p.price.toLocaleString("en-IN", {
+                                                style: "currency",
+                                                currency: "INR",
+                                            })}
+                                        </h5>
+                                    </div>
+                                    <p className="card-text"> {p.description.substring(0, 60)}...</p>
+                                    <div className="card-name-price">
+                                        <button className="btn btn-info ms-1"
+                                            onClick={() => {
+                                                navigate(`/product/${p.slug}`)
+                                                window.scrollTo({ top: 0, behavior: 'smooth' })
+                                            }
+                                            }
+                                        >
+                                            More Details
+                                        </button>
+                                        {p.quantity === 0 ? "" : (<button className="btn btn-dark ms-1"
+                                            onClick={() => {
+                                                addToCart(p);
+                                            }}
+                                        >ADD TO CART</button>)}
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -201,13 +234,13 @@ function HomePage() {
                             <h5>Found {products.length} </h5>
                         </>) : (<>
                             {products && products.length < total && (
-                                <button className='btn btn-warning'
+                                <button className='btn loadmore'
                                     onClick={(e) => {
                                         e.preventDefault()
                                         setPage(page + 1);
                                     }}
                                 >
-                                    {loading ? "Loading" : "Loadmore"}
+                                    {loading ? "Loading" : <>Loadmore < AiOutlineReload /></>}
                                 </button>
                             )}
                         </>)}

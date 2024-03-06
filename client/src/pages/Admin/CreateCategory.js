@@ -18,7 +18,7 @@ const CreateCategory = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await axios.post(`${process.env.REACT_APP_API}/api/v1/category/create-category`, { name })
+            const { data } = await axios.post("/api/v1/category/create-category", { name })
             if (data?.success) {
                 toast.success(`${name} is created`);
                 setName("");
@@ -35,7 +35,7 @@ const CreateCategory = () => {
     //get category function
     const getAllCategory = async () => {
         try {
-            const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/category/get-category`)
+            const { data } = await axios.get("/api/v1/category/get-category")
             if (data.success) {
                 setCategory(data.category);
             }
@@ -50,7 +50,7 @@ const CreateCategory = () => {
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await axios.put(`${process.env.REACT_APP_API}/api/v1/category/update-category/${selected._id}`, {
+            const { data } = await axios.put(`/api/v1/category/update-category/${selected._id}`, {
                 name: updatedName
             })
             if (data.success) {
@@ -72,7 +72,7 @@ const CreateCategory = () => {
 
     const handleDelete = async (pId) => {
         try {
-            const { data } = await axios.delete(`${process.env.REACT_APP_API}/api/v1/category/delete-category/${pId}`);
+            const { data } = await axios.delete(`/api/v1/category/delete-category/${pId}`);
             if (data.success) {
                 toast.success(`Category is deleted`);
                 getAllCategory();
@@ -92,7 +92,7 @@ const CreateCategory = () => {
 
     return (
         <Layout title={"Dashboard - Create Category"}>
-            <div className='container-fluid  p-3 '>
+            <div className='container-fluid  p-3 ' style={{ minHeight: "90vh" }}>
                 <div className='row'>
                     <div className='col-md-3' >
                         <AdminMenu />
@@ -117,12 +117,12 @@ const CreateCategory = () => {
                                             <tr>
                                                 <td key={c._id}>{c.name}</td>
                                                 <td>
-                                                    <button className="btn btn-primary ms-2" onClick={() => {
+                                                    <button className="btn btn-primary ms-2 mt-2" onClick={() => {
                                                         setVisible(true);
                                                         setUpdatedName(c.name);
                                                         setSelected(c);
                                                     }}>Edit</button>
-                                                    <button className="btn btn-danger ms-2" onClick={() => {
+                                                    <button className="btn btn-danger ms-2 mt-2" onClick={() => {
                                                         handleDelete(c._id);
                                                     }} >Delete</button>
                                                 </td>

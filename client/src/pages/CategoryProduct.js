@@ -5,6 +5,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/cart';
 import toast from 'react-hot-toast';
+import "../styles/CategoryProductStyle.css"
+
 
 const CategoryProduct = () => {
     const params = useParams();
@@ -19,7 +21,7 @@ const CategoryProduct = () => {
 
     const getProductsByCategory = async () => {
         try {
-            const { data } = await axios.get(`${process.env.REACT_APP_API}/api/v1/product/product-category/${params.slug}`);
+            const { data } = await axios.get(`/api/v1/product/product-category/${params.slug}`);
             setProducts(data?.products);
             setCategory(data?.category);
         } catch (error) {
@@ -32,49 +34,65 @@ const CategoryProduct = () => {
         let myCart = [...cart];
         const check_index = myCart.findIndex(item => item._id === c._id);
         if (check_index !== -1) {
-            myCart[check_index].qty++;
-            setCart(myCart);
-            localStorage.setItem('cart', JSON.stringify(myCart));
+            if (myCart[check_index].qty < c.quantity) {
+                myCart[check_index].qty++;
+                setCart(myCart);
+                localStorage.setItem('cart', JSON.stringify(myCart));
+                toast.success("Item added to cart");
+            } else {
+                toast.error("max out");
+            }
         } else {
             myCart.push({ ...products.find(p => p._id === c._id), qty: 1 })
             setCart(myCart);
             localStorage.setItem('cart', JSON.stringify(myCart));
+            toast.success("Item added to cart");
         }
     }
 
     return (
         <Layout>
-            <div className='container mt-3'>
+            <div className='container mt-3 category'>
                 <h4 className='text-center'>Category - {category?.name}</h4>
                 <h6 className='text-center'>{products.length} result found</h6>
                 <div className='row'>
                     <div className='d-flex flex-wrap justify-content-evenly'>
                         {products?.map((p) =>
 
-                            <div className="card m-2" style={{ width: '18rem' }} key={p._id} >
-                                <img src={`${process.env.REACT_APP_API}/api/v1/product/product-photo/${p._id}`} className="card-img-top" alt={p.name} />
+                            <div className="card mt-1 mb-3" key={p._id} >
+                                <img src={`/api/v1/product/product-photo/${p._id}`} className="card-img-top" alt={p.name} />
                                 <div className="card-body">
-                                    <h5 className="card-title">{p.name}</h5>
-                                    <p className="card-text">{p.description.substring(0, 30)}</p>
-                                    <p className="card-text">₹{p.price}</p>
-                                    <button className="btn btn-primary ms-1"
-                                        onClick={() => navigate(`/product/${p.slug}`)}
+                                    <div className="card-name-price">
+                                        <h5 className="card-title">{p.name}</h5>
+                                        <h5 className="card-title card-price">
+                                            {p.quantity === 0 ? (<p className='text-danger'>Out Of Stock</p>) : p.price.toLocaleString("en-IN", {
+                                                style: "currency",
+                                                currency: "INR",
+                                            })}
+                                        </h5>
+                                    </div>
+                                    <p className="card-text">{p.description.substring(0, 60)}...</p>
+                                    <button className="btn btn-info ms-1 mb-2"
+                                        onClick={() => {
+                                            navigate(`/product/${p.slug}`)
+                                            window.scrollTo({ top: 0, behaviour: "smooth" })
+                                        }
+                                        }
                                     >
                                         More Details
                                     </button>
-                                    <button className="btn btn-secondary ms-1"
+                                    {p.quantity === 0 ? "" : (<button className="btn btn-dark ms-1"
                                         onClick={() => {
                                             addToCart(p);
-                                            toast.success("Item added to cart");
                                         }}
-                                    >ADD TO CART</button>
+                                    >ADD TO CART</button>)}
                                 </div>
                             </div>
                         )}
                     </div>
                 </div>
             </div>
-        </Layout>
+        </Layout >
     )
 }
 

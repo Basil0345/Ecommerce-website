@@ -4,7 +4,7 @@ import Layout from './../components/Layout/Layout';
 function About() {
     return (
         <Layout title={"About us - Ecommerce App "}>
-            <div className='row contactus '>
+            <div className='row contactus' style={{ minHeight: "90vh" }}>
                 <div className='col-md-6 col-sd-4' >
                     <img
                         src="/images/about.jpeg"

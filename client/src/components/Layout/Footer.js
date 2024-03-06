@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 function Footer() {
   return (
     <div className='footer'>
-      <h4 className='text-center'>All Right Reserved &copy; Alovmi.co</h4>
+      <h5 className='text-center'>All Right Reserved &copy; Prime Mart</h5>
       <p className='text-center mt-3'>
         <Link to="/about">About</Link>
         |

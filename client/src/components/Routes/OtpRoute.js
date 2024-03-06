@@ -1,16 +1,17 @@
+
 import { useState, useEffect } from 'react';
-import { useAuth } from "../../context/auth";
+import { useOtpAuth } from '../../context/otpAuth';
 import { Outlet } from "react-router-dom";
 import axios from 'axios';
 import Spinner from '../Spinner';
 
-export default function PrivateRoute() {
+export default function OtpRoute() {
     const [ok, setOk] = useState(false);
-    const [auth, setAuth] = useAuth();
+    const [otpAuth, setOtpAuth] = useOtpAuth();
 
     useEffect(() => {
-        const authCheck = async () => {
-            const res = await axios.get("/api/v1/auth/user-auth");
+        const otpAuthCheck = async () => {
+            const res = await axios.get("/api/v1/auth/openotp");
             if (res.data.ok) {
                 setOk(true);
             } else {
@@ -18,9 +19,9 @@ export default function PrivateRoute() {
             };
         };
 
-        if (auth?.token) { authCheck() };
+        if (otpAuth?.token) { otpAuthCheck() };
 
-    }, [auth?.token]);
+    }, [otpAuth?.token]);
 
     return ok ? <Outlet /> : <Spinner />
 };

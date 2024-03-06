@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from 'react'
-import Layout from './../../components/Layout/Layout';
-import UserMenu from './../../components/Layout/UserMenu';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from '../../context/auth';
+import toast from 'react-hot-toast';
+import Layout from './../../components/Layout/Layout';
+import AdminMenu from './../../components/Layout/AdminMenu';
 import moment from 'moment';
+import { useAuth } from '../../context/auth';
+import { Select } from 'antd';
+const { Option } = Select;
 
 
-const Orders = () => {
+const AdminOrders = () => {
+    const [status, setStatus] = useState(["Not Process", "Processing", "Shipped", "delivered", "cancel"]);
+
     const [orders, setOrders] = useState([]);
     const [auth, setAuth] = useAuth();
 
     const getOrders = async () => {
         try {
-            const { data } = await axios.get("/api/v1/auth/orders");
+            const { data } = await axios.get("/api/v1/auth/all-orders");
             setOrders(data);
         } catch (error) {
             console.log(error);
@@ -23,20 +28,30 @@ const Orders = () => {
         if (auth?.token) {
             getOrders();
         }
-    }, [auth?.token])
+    }, [auth?.token]);
+
+    const handleChange = async (orderId, value) => {
+        try {
+            const { data } = await axios.put(`/api/v1/auth/order-status/${orderId}`,
+                { status: value });
+            getOrders();
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     return (
-        <Layout title={"Your Orders"}>
-            <div className="container-fluid pt-3" style={{ minHeight: "92vh" }}>
-                <div className="row">
-                    <div className="col-md-3">
-                        <UserMenu />
+        <Layout title={"Dashboard - All Orders"}>
+            <div className='container-fluid p-3 ' style={{ minHeight: "90vh" }}>
+                <div className='row'>
+                    <div className='col-md-3' >
+                        <AdminMenu />
                     </div>
-                    <div className="col-md-9">
-                        <h1 className="text-center pt-3">All Orders</h1>
+                    <div className='col-md-9'>
+                        <h3>Orders</h3>
                         {orders?.map((o, i) => {
                             return (
-                                <div className="border shadow mt-3" key={o._id}>
+                                <div className="border shadow mt-3 table-responsive" key={o._id}>
                                     <table className="table">
                                         <thead className='bg-secondary'>
                                             <tr>
@@ -50,7 +65,13 @@ const Orders = () => {
                                         <tbody>
                                             <tr>
                                                 <td>{i + 1}</td>
-                                                <td>{o?.status}</td>
+                                                <td className='p-0'>
+                                                    <Select bordered={false} onChange={(value) => handleChange(o._id, value)} defaultValue={o?.status}>
+                                                        {status.map((s, i) => (
+                                                            <Option key={i} value={s}>{s}</Option>
+                                                        ))}
+                                                    </Select>
+                                                </td>
                                                 <td>{o?.buyer?.name}</td>
                                                 <td>{moment(o?.createdAt).fromNow()}</td>
                                                 <td>{o?.payment.success ? "Success" : "Failed"}</td>
@@ -105,8 +126,8 @@ const Orders = () => {
                     </div>
                 </div>
             </div>
-        </Layout>
+        </Layout >
     )
 }
 
-export default Orders
+export default AdminOrders

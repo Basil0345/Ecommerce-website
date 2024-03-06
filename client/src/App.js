@@ -24,13 +24,17 @@ import ProductDetails from './pages/ProductDetails';
 import Categories from './pages/Categories';
 import CategoryProduct from './pages/CategoryProduct';
 import CartPage from './pages/CartPage';
+import AdminOrders from './pages/Admin/AdminOrders';
+import OtpVerification from './pages/Auth/OtpVerification';
+import OtpRoute from './components/Routes/OtpRoute';
+import OtpForm from './pages/Auth/OtpForm';
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/product/:slug" element={<ProductDetails />} />
-        <Route path="/search" element={<Search />} />
+        <Route path="/search/:keyword" element={<Search />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/category/:slug" element={<CategoryProduct />} />
@@ -47,6 +51,11 @@ function App() {
           <Route path='admin/create-product' element={<CreateProduct />} />
           <Route path='admin/product/:slug' element={<UpdateProduct />} />
           <Route path='admin/users' element={<Users />} />
+          <Route path='admin/orders' element={<AdminOrders />} />
+        </Route>
+        <Route path='/verification' element={<OtpRoute />}>
+          <Route path="otp" element={<OtpVerification />} />
+          <Route path="reset-otp" element={<OtpForm />} />
         </Route>
         <Route path="/Contact" element={<Contact />} />
         <Route path="/About" element={<About />} />

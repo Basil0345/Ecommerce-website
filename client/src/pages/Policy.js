@@ -4,7 +4,7 @@ import Layout from './../components/Layout/Layout';
 function Policy() {
     return (
         <Layout title={"Privacy Policy - Ecommerce App"}>
-            <div className='row contactus '>
+            <div className='row contactus' style={{ minHeight: "90vh" }}>
                 <div className='col-md-6 col-sd-4' >
                     <img
                         src="/images/Privacy.jpg"

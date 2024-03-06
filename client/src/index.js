@@ -8,15 +8,18 @@ import { BrowserRouter } from 'react-router-dom';
 import { SearchProvider } from './context/search';
 import { CartProvider } from './context/cart';
 import 'antd/dist/reset.css';
+import { OtpAuthProvider } from './context/otpAuth';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <AuthProvider>
     <SearchProvider>
       <CartProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <OtpAuthProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </OtpAuthProvider>
       </CartProvider>
     </SearchProvider>
   </AuthProvider>
